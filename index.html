@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Inline Form Demo Page</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        // Super-simplistic polyfill for target=_inline proposal.
+        document.addEventListener('submit', async (e) => {
+            if (e.target.target != "_inline") {
+                return;
+            }
+            e.preventDefault();
+            const q = new URLSearchParams(new FormData(e.target));
+            const url = new URL(e.target.action);
+            for (const [key, value] of url.searchParams) {
+                q.set(key, value);
+            }
+            url.search = q.toString();
+            const resp = await fetch(url.toString());
+            const body = await resp.text();
+            e.target.innerHTML = body;
+        });
+    </script>
+</head>
+
+<body>
+    <h1>Inline Form Demo Page</h1>
+    <form action="/form" method="get" target=_inline accept-charset="utf-8">
+        <input type="hidden" name="status" value="check">
+        <p>&check;</p>
+        <p><input type="submit" value="Toggle"></p>
+    </form>
+</body>
+
+</html>
